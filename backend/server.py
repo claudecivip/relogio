@@ -107,6 +107,29 @@ app.include_router(api_router)
 trading_router = create_trading_router(db, trading_bot)
 app.include_router(trading_router)
 
+@app.on_event("startup")
+async def startup_db_indexes():
+    """Criar índices do banco de dados na inicialização"""
+    try:
+        logger.info("Creating database indexes...")
+        
+        # Índices para trades
+        await db.trades.create_index([('timestamp', -1)])
+        await db.trades.create_index([('session_id', 1)])
+        
+        # Índices para positions
+        await db.positions.create_index([('status', 1)])
+        await db.positions.create_index([('session_id', 1)])
+        await db.positions.create_index([('status', 1), ('session_id', 1)])
+        
+        # Índices para trading_sessions
+        await db.trading_sessions.create_index([('start_time', -1)])
+        await db.trading_sessions.create_index([('status', 1)])
+        
+        logger.info("✅ Database indexes created successfully")
+    except Exception as e:
+        logger.error(f"Error creating indexes: {e}")
+
 logger.info("AI Trading Platform API initialized")
 logger.info(f"Database: {os.environ['DB_NAME']}")
 logger.info(f"Binance API configured: {bool(os.getenv('BINANCE_API_KEY'))}")
