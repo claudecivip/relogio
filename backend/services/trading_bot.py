@@ -226,8 +226,20 @@ class TradingBot:
     async def _check_open_positions(self):
         """Verifica e gerencia posições abertas"""
         try:
-            # Buscar posições abertas no banco
-            positions = await self.db.positions.find({'status': 'open', 'session_id': self.session_id}).to_list(100)
+            # Criar índice se não existir
+            await self.db.positions.create_index([('status', 1), ('session_id', 1)])
+            
+            # Buscar posições abertas no banco com projeção
+            positions = await self.db.positions.find(
+                {'status': 'open', 'session_id': self.session_id},
+                {
+                    'id': 1,
+                    'symbol': 1,
+                    'entry_price': 1,
+                    'type': 1,
+                    'opened_at': 1
+                }
+            ).to_list(100)
             
             for position in positions:
                 # Obter preço atual
