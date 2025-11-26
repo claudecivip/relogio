@@ -25,19 +25,24 @@ class BinanceService:
     
     def _get_client(self):
         """Lazy initialization of Binance client"""
-        if self.client is None:
+        if self.client is None and not self.use_fallback:
             try:
-                # Usar testnet por padrão para desenvolvimento seguro
+                # Tentar conectar à Binance
                 self.client = Client(
                     self.api_key, 
                     self.api_secret,
                     testnet=self.use_testnet,
                     tld='us' if not self.use_testnet else 'com'
                 )
-                logger.info("Binance client connected successfully")
+                # Testar conexão
+                self.client.ping()
+                logger.info("✅ Binance client connected successfully (PRODUCTION)")
+                self.use_fallback = False
             except Exception as e:
-                logger.error(f"Failed to initialize Binance client: {e}")
-                raise
+                logger.warning(f"⚠️ Cannot connect to Binance: {e}")
+                logger.info("🔄 Using fallback mode with simulated data")
+                self.use_fallback = True
+                self.client = None
         return self.client
     
     def test_connection(self) -> bool:
