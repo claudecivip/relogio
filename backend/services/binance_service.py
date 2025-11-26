@@ -156,6 +156,10 @@ class BinanceService:
         """Retorna dados de candlestick"""
         try:
             client = self._get_client()
+            
+            if self.use_fallback or client is None:
+                return fallback_service.get_klines(symbol, interval, limit)
+            
             klines = client.get_klines(
                 symbol=symbol,
                 interval=interval,
