@@ -185,7 +185,8 @@ class BinanceService:
     def place_limit_order(self, symbol: str, side: str, quantity: float, price: float) -> Dict:
         """Executa ordem limitada"""
         try:
-            order = self.client.order_limit(
+            client = self._get_client()
+            order = client.order_limit(
                 symbol=symbol,
                 side=side,
                 quantity=quantity,
