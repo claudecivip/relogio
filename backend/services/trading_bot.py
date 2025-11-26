@@ -4,6 +4,12 @@ from typing import Dict, Optional
 from datetime import datetime
 from .binance_service import BinanceService
 from .ai_trading_service import AITradingService
+import sys
+from pathlib import Path
+
+# Add parent directory to path for config import
+sys.path.append(str(Path(__file__).parent.parent))
+from config.trading_config import trading_config
 
 logger = logging.getLogger(__name__)
 
