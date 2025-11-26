@@ -210,7 +210,7 @@ function App() {
           {/* Coluna Esquerda - Lista de Ativos */}
           <div className="lg:col-span-3">
             <AssetList 
-              assets={mockAssets}
+              assets={assets}
               onSelectAsset={handleSelectAsset}
               selectedAsset={selectedAsset}
             />
