@@ -225,7 +225,8 @@ class BinanceService:
     def cancel_order(self, symbol: str, order_id: int) -> bool:
         """Cancela uma ordem"""
         try:
-            self.client.cancel_order(symbol=symbol, orderId=order_id)
+            client = self._get_client()
+            client.cancel_order(symbol=symbol, orderId=order_id)
             return True
         except BinanceAPIException as e:
             logger.error(f"Error canceling order: {e}")
