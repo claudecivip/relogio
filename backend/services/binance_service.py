@@ -51,7 +51,8 @@ class BinanceService:
     def get_account_balance(self) -> Dict:
         """Retorna saldo da conta"""
         try:
-            account = self.client.get_account()
+            client = self._get_client()
+            account = client.get_account()
             
             balances = {}
             total_usdt = 0.0
