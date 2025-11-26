@@ -94,7 +94,8 @@ class BinanceService:
     def get_symbol_price(self, symbol: str) -> float:
         """Retorna preço atual de um símbolo"""
         try:
-            ticker = self.client.get_symbol_ticker(symbol=symbol)
+            client = self._get_client()
+            ticker = client.get_symbol_ticker(symbol=symbol)
             return float(ticker['price'])
         except BinanceAPIException as e:
             logger.error(f"Error getting price for {symbol}: {e}")
