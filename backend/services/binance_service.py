@@ -161,7 +161,8 @@ class BinanceService:
     def place_market_order(self, symbol: str, side: str, quantity: float) -> Dict:
         """Executa ordem de mercado"""
         try:
-            order = self.client.order_market(
+            client = self._get_client()
+            order = client.order_market(
                 symbol=symbol,
                 side=side,
                 quantity=quantity
