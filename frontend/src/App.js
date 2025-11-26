@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { Toaster } from './components/ui/sonner';
+import { Toaster, toast } from './components/ui/sonner';
 import TradingChart from './components/TradingChart';
 import ControlPanel from './components/ControlPanel';
 import AssetList from './components/AssetList';
 import PositionsList from './components/PositionsList';
 import TradeHistory from './components/TradeHistory';
 import AccountBalance from './components/AccountBalance';
-import { 
-  mockAssets, 
-  generateMockCandleData,
-  mockPositions,
-  mockTradeHistory,
-  mockAccountBalance 
-} from './mock/tradingData';
 import { Bot } from 'lucide-react';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 function App() {
   const [selectedAsset, setSelectedAsset] = useState('BTCUSDT');
