@@ -9,18 +9,34 @@ logger = logging.getLogger(__name__)
 
 class BinanceService:
     def __init__(self):
-        api_key = os.getenv('BINANCE_API_KEY')
-        api_secret = os.getenv('BINANCE_API_SECRET')
+        self.api_key = os.getenv('BINANCE_API_KEY')
+        self.api_secret = os.getenv('BINANCE_API_SECRET')
         
-        if not api_key or not api_secret:
-            raise ValueError("Binance API keys not found in environment")
+        if not self.api_key or not self.api_secret:
+            logger.warning("Binance API keys not found in environment")
         
-        # Usar testnet para desenvolvimento seguro
-        # Para produção, remover testnet=True
-        self.client = Client(api_key, api_secret, testnet=False)
+        self.client = None
         self.usdt_to_brl = float(os.getenv('USDT_TO_BRL', 5.0))
+        self.use_testnet = os.getenv('BINANCE_TESTNET', 'true').lower() == 'true'
         
-        logger.info("Binance service initialized")
+        logger.info(f"Binance service initialized (testnet: {self.use_testnet})")
+    
+    def _get_client(self):
+        """Lazy initialization of Binance client"""
+        if self.client is None:
+            try:
+                # Usar testnet por padrão para desenvolvimento seguro
+                self.client = Client(
+                    self.api_key, 
+                    self.api_secret,
+                    testnet=self.use_testnet,
+                    tld='us' if not self.use_testnet else 'com'
+                )
+                logger.info("Binance client connected successfully")
+            except Exception as e:
+                logger.error(f"Failed to initialize Binance client: {e}")
+                raise
+        return self.client
     
     def test_connection(self) -> bool:
         """Testa conexão com Binance"""
