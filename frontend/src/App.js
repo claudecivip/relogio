@@ -17,35 +17,110 @@ function App() {
   const [selectedAsset, setSelectedAsset] = useState('BTCUSDT');
   const [candleData, setCandleData] = useState([]);
   const [isTrading, setIsTrading] = useState(false);
-  const [positions, setPositions] = useState(mockPositions);
-  const [tradeHistory, setTradeHistory] = useState(mockTradeHistory);
-  const [balance, setBalance] = useState(mockAccountBalance);
+  const [positions, setPositions] = useState([]);
+  const [tradeHistory, setTradeHistory] = useState([]);
+  const [balance, setBalance] = useState({ totalBalance: 0, availableBalance: 0, inPositions: 0, totalPnL: 0, todayPnL: 0 });
   const [tradingConfig, setTradingConfig] = useState(null);
+  const [assets, setAssets] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Carregar dados iniciais
   useEffect(() => {
-    // Gerar dados iniciais do gráfico
-    setCandleData(generateMockCandleData(100));
+    loadInitialData();
+  }, []);
 
-    // Simular atualização em tempo real do gráfico
-    const interval = setInterval(() => {
-      setCandleData(prev => {
-        const lastCandle = prev[prev.length - 1];
-        const newPrice = lastCandle.close + (Math.random() - 0.5) * 50;
-        
-        const newCandle = {
-          time: Date.now() / 1000,
-          open: lastCandle.close,
-          high: Math.max(lastCandle.close, newPrice) + Math.random() * 20,
-          low: Math.min(lastCandle.close, newPrice) - Math.random() * 20,
-          close: newPrice
-        };
-
-        return [...prev.slice(1), newCandle];
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      
+      // Carregar ativos do mercado
+      const assetsResponse = await axios.get(`${API}/market/assets`);
+      setAssets(assetsResponse.data);
+      
+      // Carregar saldo
+      const balanceResponse = await axios.get(`${API}/account/balance`);
+      const balanceData = balanceResponse.data;
+      setBalance({
+        totalBalance: balanceData.total_brl || 0,
+        availableBalance: balanceData.total_brl || 0,
+        inPositions: 0,
+        totalPnL: 0,
+        todayPnL: 0
       });
-    }, 2000);
+      
+      // Carregar histórico de trades
+      try {
+        const tradesResponse = await axios.get(`${API}/trades/history`);
+        setTradeHistory(tradesResponse.data);
+      } catch (e) {
+        console.log('No trades history yet');
+      }
+      
+      // Carregar posições
+      try {
+        const positionsResponse = await axios.get(`${API}/positions/active`);
+        setPositions(positionsResponse.data);
+      } catch (e) {
+        console.log('No active positions');
+      }
+      
+      toast.success('Dados carregados da Binance!');
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('Erro ao carregar dados. Usando modo demonstração.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Carregar dados do gráfico quando mudar o ativo
+  useEffect(() => {
+    if (selectedAsset) {
+      loadCandleData(selectedAsset);
+    }
+  }, [selectedAsset]);
+
+  const loadCandleData = async (symbol) => {
+    try {
+      const response = await axios.get(`${API}/market/candles/${symbol}`, {
+        params: { interval: '1m', limit: 100 }
+      });
+      setCandleData(response.data);
+    } catch (error) {
+      console.error('Error loading candles:', error);
+    }
+  };
+
+  // Atualizar dados em tempo real
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        // Atualizar último candle
+        if (selectedAsset) {
+          const response = await axios.get(`${API}/market/candles/${selectedAsset}`, {
+            params: { interval: '1m', limit: 1 }
+          });
+          
+          if (response.data && response.data.length > 0) {
+            setCandleData(prev => {
+              const newData = [...prev];
+              newData[newData.length - 1] = response.data[0];
+              return newData;
+            });
+          }
+        }
+        
+        // Atualizar lista de ativos
+        const assetsResponse = await axios.get(`${API}/market/assets`);
+        setAssets(assetsResponse.data);
+        
+      } catch (error) {
+        console.error('Error updating data:', error);
+      }
+    }, 5000); // Atualizar a cada 5 segundos
 
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedAsset]);
 
   // Simular trading automático
   useEffect(() => {
