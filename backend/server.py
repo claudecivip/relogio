@@ -10,9 +10,19 @@ from typing import List
 import uuid
 from datetime import datetime, timezone
 
+# Import trading components
+from routes.trading_routes import create_trading_router
+from services.trading_bot import TradingBot
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -20,9 +30,21 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI()
+app = FastAPI(title="AI Trading Platform API")
 
-# Create a router with the /api prefix
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Initialize Trading Bot
+trading_bot = TradingBot(db)
+
+# Create a router with the /api prefix for basic routes
 api_router = APIRouter(prefix="/api")
 
 
