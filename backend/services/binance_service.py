@@ -59,6 +59,11 @@ class BinanceService:
         """Retorna saldo da conta"""
         try:
             client = self._get_client()
+            
+            if self.use_fallback or client is None:
+                logger.info("Using fallback for account balance")
+                return fallback_service.get_account_balance()
+            
             account = client.get_account()
             
             balances = {}
