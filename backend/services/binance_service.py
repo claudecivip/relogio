@@ -104,8 +104,9 @@ class BinanceService:
     def get_top_symbols(self, limit: int = 10) -> List[Dict]:
         """Retorna os principais pares de trading"""
         try:
+            client = self._get_client()
             # Pegar tickers de 24h
-            tickers = self.client.get_ticker()
+            tickers = client.get_ticker()
             
             # Filtrar apenas USDT pairs
             usdt_pairs = [t for t in tickers if t['symbol'].endswith('USDT')]
