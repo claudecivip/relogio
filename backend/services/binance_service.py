@@ -4,6 +4,7 @@ import os
 from typing import List, Dict, Optional
 import logging
 from datetime import datetime
+from .fallback_service import fallback_service
 
 logger = logging.getLogger(__name__)
 
