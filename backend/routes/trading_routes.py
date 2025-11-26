@@ -184,7 +184,30 @@ def create_trading_router(db, trading_bot: TradingBot):
     async def get_active_positions():
         """Retorna posições ativas"""
         try:
-            positions = await db.positions.find({'status': 'open'}).to_list(100)
+            # Criar índice se não existir
+            await db.positions.create_index([('status', 1), ('session_id', 1)])
+            
+            # Query otimizada com projeção
+            positions = await db.positions.find(
+                {'status': 'open'},
+                {
+                    'id': 1,
+                    'session_id': 1,
+                    'symbol': 1,
+                    'type': 1,
+                    'amount': 1,
+                    'entry_price': 1,
+                    'current_price': 1,
+                    'pnl': 1,
+                    'pnl_percent': 1,
+                    'leverage': 1,
+                    'stop_loss': 1,
+                    'take_profit': 1,
+                    'liquidation_price': 1,
+                    'opened_at': 1,
+                    'status': 1
+                }
+            ).limit(100).to_list(100)
             return positions
         except Exception as e:
             logger.error(f"Error getting positions: {e}")
