@@ -107,6 +107,10 @@ class BinanceService:
         """Retorna preço atual de um símbolo"""
         try:
             client = self._get_client()
+            
+            if self.use_fallback or client is None:
+                return fallback_service.get_symbol_price(symbol)
+            
             ticker = client.get_symbol_ticker(symbol=symbol)
             return float(ticker['price'])
         except BinanceAPIException as e:
