@@ -41,7 +41,8 @@ class BinanceService:
     def test_connection(self) -> bool:
         """Testa conexão com Binance"""
         try:
-            self.client.ping()
+            client = self._get_client()
+            client.ping()
             return True
         except Exception as e:
             logger.error(f"Binance connection test failed: {e}")
