@@ -121,6 +121,10 @@ class BinanceService:
         """Retorna os principais pares de trading"""
         try:
             client = self._get_client()
+            
+            if self.use_fallback or client is None:
+                return fallback_service.get_top_symbols(limit)
+            
             # Pegar tickers de 24h
             tickers = client.get_ticker()
             
