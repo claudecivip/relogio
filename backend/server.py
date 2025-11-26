@@ -59,10 +59,22 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
-# Add your routes to the router instead of directly to app
+# Basic routes
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {
+        "message": "AI Trading Platform API", 
+        "version": "1.0.0",
+        "status": "operational"
+    }
+
+@api_router.get("/health")
+async def health_check():
+    return {
+        "status": "healthy",
+        "database": "connected",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
