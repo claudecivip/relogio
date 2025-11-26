@@ -135,7 +135,8 @@ class BinanceService:
     def get_klines(self, symbol: str, interval: str = '1m', limit: int = 100) -> List[Dict]:
         """Retorna dados de candlestick"""
         try:
-            klines = self.client.get_klines(
+            client = self._get_client()
+            klines = client.get_klines(
                 symbol=symbol,
                 interval=interval,
                 limit=limit
