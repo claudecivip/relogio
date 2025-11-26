@@ -10,62 +10,72 @@ const TradingChart = ({ symbol, candleData }) => {
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    // Criar o gráfico
-    const chart = createChart(chartContainerRef.current, {
-      width: chartContainerRef.current.clientWidth,
-      height: 500,
-      layout: {
-        background: { color: '#0B0E11' },
-        textColor: '#D1D4DC',
-      },
-      grid: {
-        vertLines: { color: '#1A1D23' },
-        horzLines: { color: '#1A1D23' },
-      },
-      crosshair: {
-        mode: 1,
-      },
-      rightPriceScale: {
-        borderColor: '#2B2F36',
-      },
-      timeScale: {
-        borderColor: '#2B2F36',
-        timeVisible: true,
-        secondsVisible: false,
-      },
-    });
+    let chart = null;
+    let candleSeries = null;
 
-    // Adicionar série de candlesticks
-    const candleSeries = chart.addCandlestickSeries({
-      upColor: '#26a69a',
-      downColor: '#ef5350',
-      borderVisible: false,
-      wickUpColor: '#26a69a',
-      wickDownColor: '#ef5350',
-    });
+    // Importar dinamicamente para evitar problemas SSR
+    import('lightweight-charts').then(({ createChart }) => {
+      // Criar o gráfico
+      chart = createChart(chartContainerRef.current, {
+        width: chartContainerRef.current.clientWidth,
+        height: 500,
+        layout: {
+          background: { color: '#0B0E11' },
+          textColor: '#D1D4DC',
+        },
+        grid: {
+          vertLines: { color: '#1A1D23' },
+          horzLines: { color: '#1A1D23' },
+        },
+        crosshair: {
+          mode: 1,
+        },
+        rightPriceScale: {
+          borderColor: '#2B2F36',
+        },
+        timeScale: {
+          borderColor: '#2B2F36',
+          timeVisible: true,
+          secondsVisible: false,
+        },
+      });
 
-    chartRef.current = chart;
-    candleSeriesRef.current = candleSeries;
+      // Adicionar série de candlesticks
+      candleSeries = chart.addCandlestickSeries({
+        upColor: '#26a69a',
+        downColor: '#ef5350',
+        borderVisible: false,
+        wickUpColor: '#26a69a',
+        wickDownColor: '#ef5350',
+      });
 
-    // Adicionar dados
-    if (candleData && candleData.length > 0) {
-      candleSeries.setData(candleData);
-    }
+      chartRef.current = chart;
+      candleSeriesRef.current = candleSeries;
 
-    // Redimensionamento responsivo
-    const handleResize = () => {
-      if (chartContainerRef.current) {
-        chart.applyOptions({ 
-          width: chartContainerRef.current.clientWidth 
-        });
+      // Adicionar dados
+      if (candleData && candleData.length > 0) {
+        candleSeries.setData(candleData);
       }
-    };
 
-    window.addEventListener('resize', handleResize);
+      // Redimensionamento responsivo
+      const handleResize = () => {
+        if (chartContainerRef.current && chart) {
+          chart.applyOptions({ 
+            width: chartContainerRef.current.clientWidth 
+          });
+        }
+      };
+
+      window.addEventListener('resize', handleResize);
+    }).catch(err => {
+      console.error('Failed to load chart library:', err);
+    });
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-      chart.remove();
+      if (chart) {
+        window.removeEventListener('resize', () => {});
+        chart.remove();
+      }
     };
   }, []);
 
