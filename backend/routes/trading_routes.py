@@ -8,6 +8,12 @@ import json
 from models.trading_models import TradingConfig, Trade, Position
 from services.binance_service import BinanceService
 from services.trading_bot import TradingBot
+import sys
+from pathlib import Path
+
+# Add parent directory to path for config import
+sys.path.append(str(Path(__file__).parent.parent))
+from config.trading_config import trading_config as global_trading_config
 
 logger = logging.getLogger(__name__)
 
