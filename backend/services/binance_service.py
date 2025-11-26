@@ -19,6 +19,7 @@ class BinanceService:
         self.client = None
         self.usdt_to_brl = float(os.getenv('USDT_TO_BRL', 5.0))
         self.use_testnet = os.getenv('BINANCE_TESTNET', 'true').lower() == 'true'
+        self.use_fallback = False
         
         logger.info(f"Binance service initialized (testnet: {self.use_testnet})")
     
