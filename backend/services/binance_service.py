@@ -210,7 +210,8 @@ class BinanceService:
     def get_order_status(self, symbol: str, order_id: int) -> Dict:
         """Verifica status de uma ordem"""
         try:
-            order = self.client.get_order(symbol=symbol, orderId=order_id)
+            client = self._get_client()
+            order = client.get_order(symbol=symbol, orderId=order_id)
             return {
                 'order_id': order['orderId'],
                 'status': order['status'],
