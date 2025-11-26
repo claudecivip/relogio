@@ -153,7 +153,26 @@ def create_trading_router(db, trading_bot: TradingBot):
     async def get_trade_history(limit: int = 50):
         """Retorna histórico de trades"""
         try:
-            trades = await db.trades.find().sort('timestamp', -1).limit(limit).to_list(limit)
+            # Criar índice se não existir
+            await db.trades.create_index([('timestamp', -1)])
+            
+            # Query otimizada com projeção
+            trades = await db.trades.find(
+                {},
+                {
+                    'id': 1,
+                    'session_id': 1,
+                    'symbol': 1,
+                    'side': 1,
+                    'type': 1,
+                    'amount': 1,
+                    'price': 1,
+                    'total': 1,
+                    'timestamp': 1,
+                    'status': 1,
+                    'binance_order_id': 1
+                }
+            ).sort('timestamp', -1).limit(limit).to_list(limit)
             return trades
         except Exception as e:
             logger.error(f"Error getting trade history: {e}")
