@@ -7,6 +7,7 @@ import AssetList from './components/AssetList';
 import PositionsList from './components/PositionsList';
 import TradeHistory from './components/TradeHistory';
 import AccountBalance from './components/AccountBalance';
+import TradingModeToggle from './components/TradingModeToggle';
 import { Bot } from 'lucide-react';
 import axios from 'axios';
 
