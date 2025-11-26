@@ -164,17 +164,35 @@ class TradingBot:
             
             logger.info(f"Attempting to buy {quantity} of {symbol} at ${current_price:.2f}")
             
-            # Executar ordem (COMENTADO PARA SEGURANÇA - descomente quando estiver pronto)
-            # order = self.binance.place_market_order(symbol, 'BUY', quantity)
-            
-            # Por enquanto, apenas simular
-            order = {
-                'order_id': 'SIMULATED',
-                'symbol': symbol,
-                'side': 'BUY',
-                'quantity': quantity,
-                'price': current_price
-            }
+            # Verificar modo de trading
+            if trading_config.is_real_mode():
+                # MODO REAL - Executar ordem real na Binance
+                logger.warning(f"🔴 REAL MODE: Executing REAL order on Binance")
+                try:
+                    order = self.binance.place_market_order(symbol, 'BUY', quantity)
+                    logger.info(f"✅ Real order executed: {order}")
+                except Exception as e:
+                    logger.error(f"❌ Failed to execute real order: {e}")
+                    # Fallback para simulação em caso de erro
+                    order = {
+                        'order_id': f'FAILED_{symbol}',
+                        'symbol': symbol,
+                        'side': 'BUY',
+                        'quantity': quantity,
+                        'price': current_price,
+                        'error': str(e)
+                    }
+            else:
+                # MODO DEMO - Apenas simular
+                logger.info(f"🟢 DEMO MODE: Simulating order (no real money)")
+                order = {
+                    'order_id': f'DEMO_{int(datetime.utcnow().timestamp())}',
+                    'symbol': symbol,
+                    'side': 'BUY',
+                    'quantity': quantity,
+                    'price': current_price,
+                    'status': 'SIMULATED'
+                }
             
             # Salvar trade no banco
             trade = {
