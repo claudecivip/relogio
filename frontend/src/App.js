@@ -122,48 +122,57 @@ function App() {
     return () => clearInterval(interval);
   }, [selectedAsset]);
 
-  // Simular trading automático
-  useEffect(() => {
-    if (!isTrading) return;
-
-    const tradingInterval = setInterval(() => {
-      // Simular atualização de posições
-      setPositions(prev => 
-        prev.map(pos => ({
-          ...pos,
-          currentPrice: pos.currentPrice + (Math.random() - 0.5) * 100,
-          pnl: pos.pnl + (Math.random() - 0.5) * 50
-        }))
-      );
-
-      // Simular atualização do saldo
-      setBalance(prev => ({
-        ...prev,
-        totalPnL: prev.totalPnL + (Math.random() - 0.4) * 20,
-        todayPnL: prev.todayPnL + (Math.random() - 0.4) * 10
-      }));
-    }, 5000);
-
-    return () => clearInterval(tradingInterval);
-  }, [isTrading]);
-
-  const handleStartTrading = (config) => {
-    setTradingConfig(config);
-    setIsTrading(true);
+  const handleStartTrading = async (config) => {
+    try {
+      const response = await axios.post(`${API}/trading/start`, config);
+      
+      if (response.data.status === 'started') {
+        setTradingConfig(config);
+        setIsTrading(true);
+        toast.success('Trading automático iniciado!');
+      }
+    } catch (error) {
+      console.error('Error starting trading:', error);
+      toast.error('Erro ao iniciar trading automático');
+    }
   };
 
-  const handleStopTrading = () => {
-    setIsTrading(false);
+  const handleStopTrading = async () => {
+    try {
+      await axios.post(`${API}/trading/stop`);
+      setIsTrading(false);
+      toast.info('Trading automático pausado');
+    } catch (error) {
+      console.error('Error stopping trading:', error);
+      toast.error('Erro ao parar trading');
+    }
   };
 
   const handleSelectAsset = (symbol) => {
     setSelectedAsset(symbol);
-    setCandleData(generateMockCandleData(100));
   };
 
-  const handleClosePosition = (positionId) => {
-    setPositions(prev => prev.filter(p => p.id !== positionId));
+  const handleClosePosition = async (positionId) => {
+    try {
+      await axios.post(`${API}/positions/close/${positionId}`);
+      setPositions(prev => prev.filter(p => p.id !== positionId));
+      toast.success('Posição fechada com sucesso');
+    } catch (error) {
+      console.error('Error closing position:', error);
+      toast.error('Erro ao fechar posição');
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#050709] flex items-center justify-center">
+        <div className="text-center">
+          <Bot className="text-[#26a69a] mx-auto mb-4 animate-pulse" size={48} />
+          <p className="text-white text-xl">Carregando dados da Binance...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#050709]">
