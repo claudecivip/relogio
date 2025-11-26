@@ -113,7 +113,39 @@ def create_trading_router(db, trading_bot: TradingBot):
     @router.get("/trading/status")
     async def get_trading_status():
         """Retorna status do bot"""
-        return trading_bot.get_status()
+        bot_status = trading_bot.get_status()
+        mode_status = global_trading_config.get_status()
+        
+        return {
+            **bot_status,
+            'trading_mode': mode_status
+        }
+    
+    @router.get("/trading/mode")
+    async def get_trading_mode():
+        """Retorna modo de trading atual"""
+        return global_trading_config.get_status()
+    
+    @router.post("/trading/mode/{mode}")
+    async def set_trading_mode(mode: str):
+        """Define modo de trading (demo ou real)"""
+        try:
+            if mode not in ['demo', 'real']:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Mode must be 'demo' or 'real'"
+                )
+            
+            global_trading_config.set_mode(mode)
+            
+            return {
+                'status': 'success',
+                'message': f'Modo alterado para {mode.upper()}',
+                'config': global_trading_config.get_status()
+            }
+        except Exception as e:
+            logger.error(f"Error setting mode: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
     
     # ============ TRADES E HISTÓRICO ============
     
