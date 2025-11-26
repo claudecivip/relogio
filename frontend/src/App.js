@@ -231,6 +231,8 @@ function App() {
           <div className="lg:col-span-3 space-y-6">
             <AccountBalance balance={balance} />
             
+            <TradingModeToggle />
+            
             <ControlPanel
               onStart={handleStartTrading}
               onStop={handleStopTrading}
