@@ -72,10 +72,10 @@ const TradingModeToggle = () => {
 
   if (loading) {
     return (
-      <Card className=\"bg-[#0B0E11] border-[#1A1D23] p-4\">
-        <div className=\"animate-pulse\">
-          <div className=\"h-4 bg-[#1A1D23] rounded w-3/4 mb-2\"></div>
-          <div className=\"h-8 bg-[#1A1D23] rounded\"></div>
+      <Card className="bg-[#0B0E11] border-[#1A1D23] p-4">
+        <div className="animate-pulse">
+          <div className="h-4 bg-[#1A1D23] rounded w-3/4 mb-2"></div>
+          <div className="h-8 bg-[#1A1D23] rounded"></div>
         </div>
       </Card>
     );
@@ -87,20 +87,20 @@ const TradingModeToggle = () => {
         ? 'bg-gradient-to-br from-[#ef5350]/10 to-[#0B0E11] border-[#ef5350]/30' 
         : 'bg-[#0B0E11] border-[#26a69a]/30'
     }`}>
-      <div className=\"p-4\">
-        <div className=\"flex items-center justify-between mb-3\">
-          <div className=\"flex items-center space-x-2\">
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-2">
             {isRealMode ? (
-              <AlertTriangle className=\"text-[#ef5350]\" size={20} />
+              <AlertTriangle className="text-[#ef5350]" size={20} />
             ) : (
-              <Shield className=\"text-[#26a69a]\" size={20} />
+              <Shield className="text-[#26a69a]" size={20} />
             )}
-            <Label className=\"text-white font-semibold\">
+            <Label className="text-white font-semibold">
               Modo de Trading
             </Label>
           </div>
           
-          <div className=\"flex items-center space-x-2\">
+          <div className="flex items-center space-x-2">
             <span className={`text-sm font-medium ${
               isRealMode ? 'text-gray-400' : 'text-[#26a69a]'
             }`}>
@@ -127,20 +127,20 @@ const TradingModeToggle = () => {
         }`}>
           {isRealMode ? (
             <div>
-              <p className=\"text-[#ef5350] font-bold text-sm mb-1\">
+              <p className="text-[#ef5350] font-bold text-sm mb-1">
                 🔴 MODO REAL ATIVADO
               </p>
-              <p className=\"text-gray-300 text-xs\">
+              <p className="text-gray-300 text-xs">
                 Trades serão executados com dinheiro REAL na sua conta Binance. 
                 Tenha cuidado e monitore constantemente!
               </p>
             </div>
           ) : (
             <div>
-              <p className=\"text-[#26a69a] font-bold text-sm mb-1\">
+              <p className="text-[#26a69a] font-bold text-sm mb-1">
                 🟢 MODO DEMO ATIVO
               </p>
-              <p className=\"text-gray-300 text-xs\">
+              <p className="text-gray-300 text-xs">
                 Todos os trades são simulados. Seu dinheiro está seguro.
                 Ative o modo REAL quando estiver pronto.
               </p>
@@ -149,8 +149,8 @@ const TradingModeToggle = () => {
         </div>
 
         {isRealMode && (
-          <div className=\"mt-3 p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg\">
-            <p className=\"text-yellow-500 text-xs font-medium\">
+          <div className="mt-3 p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+            <p className="text-yellow-500 text-xs font-medium">
               ⚠️ Sempre comece com valores pequenos no modo REAL!
             </p>
           </div>
